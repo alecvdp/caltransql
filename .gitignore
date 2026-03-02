@@ -1,0 +1,21 @@
+# Environment
+.env
+
+# Data files (can be large CSVs)
+data/*.csv
+data/*.zip
+data/*.gz
+
+# Keep the data directory itself
+!data/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
