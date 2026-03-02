@@ -40,29 +40,71 @@ docker compose up -d
 
 ## Datasets
 
-### National Bridge Inventory (NBI)
+### Core Tables (start here)
+
+#### National Bridge Inventory (NBI)
 - **Source:** [FHWA](https://www.fhwa.dot.gov/bridge/nbi/ascii.cfm)
-- **What:** Every bridge in California (25,000+) with condition ratings, age, dimensions, traffic, materials, and more
+- **What:** Every bridge in California (25,000+) with 115+ attributes - condition ratings, age, dimensions, traffic, materials, owner, and more
 - **Table:** `bridges`
+- **Size:** ~25,000 rows
 - **Great for:** Filtering, aggregations, window functions, condition analysis
 
-### Construction Projects
-- **Source:** [Caltrans Construction](https://dot.ca.gov/programs/construction)
-- **What:** Highway construction and improvement projects with costs, schedules, and locations
+#### Construction Projects (SHOPP)
+- **Source:** [Caltrans SB1 Program](https://dot.ca.gov/programs/asset-management/caltrans-project-portal)
+- **What:** State Highway Operation & Protection Program projects - bridge rehab, pavement, safety improvements
 - **Table:** `construction_projects`
+- **Size:** ~600+ projects
 - **Great for:** JOINs with bridges, cost analysis, project tracking
 
-### Contract & Bid Data
-- **Source:** [Caltrans Contract Cost Data](https://dot.ca.gov/programs/construction/contract-cost-data)
+#### Contract & Bid Data
+- **Source:** [Caltrans Contract Cost Data](https://sv08data.dot.ca.gov/contractcost/)
 - **What:** Contract awards including contractor info, bid amounts, engineer estimates
 - **Table:** `contracts`
+- **Note:** Web search tool only (no bulk CSV). Sample data provided for exercises.
 - **Great for:** JOINs, financial analysis, bid vs estimate comparisons
 
-### Traffic Counts
-- **Source:** [Caltrans Traffic Census](https://dot.ca.gov/programs/traffic-operations/census)
-- **What:** Annual Average Daily Traffic (AADT) at stations across the highway system
+#### Traffic Counts (AADT)
+- **Source:** [data.ca.gov](https://data.ca.gov/dataset/annual-average-daily-traffic)
+- **What:** Annual Average Daily Traffic at stations across the highway system
 - **Table:** `traffic_counts`
-- **Great for:** Time series, route analysis, truck traffic patterns
+- **Size:** ~5,000-15,000 stations
+- **Great for:** Time series, route analysis, aggregations
+
+### Extended Tables (add when ready for more)
+
+#### Truck Traffic (AADT)
+- **Source:** [Caltrans GIS Open Data](https://gisdata-caltrans.opendata.arcgis.com/)
+- **What:** Truck traffic with axle-class breakdown (2-axle through 5+ axle) and Equivalent Axle Load (EAL) data used in pavement thickness design
+- **Table:** `truck_traffic`
+- **Great for:** JOINs with traffic_counts, percentage calculations, CASE statements
+
+#### Crash Data (CCRS)
+- **Source:** [data.ca.gov](https://data.ca.gov/dataset/ccrs)
+- **What:** California Crash Reporting System (replaced SWITRS in 2025). Three linked tables: crashes, parties, victims
+- **Tables:** `crashes`, `crash_parties`, `crash_victims`
+- **Size:** 100K+ records per year
+- **Great for:** Multi-table JOINs (3-table hierarchy), filtering, aggregations
+
+#### Construction Cost Index (NHCCI)
+- **Source:** [FHWA / data.transportation.gov](https://data.transportation.gov/Research-and-Statistics/NHCCI/r94d-n4f9)
+- **What:** Quarterly highway construction cost index since 2003. Used to adjust historical bid prices to current dollars.
+- **Table:** `construction_cost_index`
+- **Size:** ~90 rows
+- **Great for:** Time series, window functions (LAG/LEAD), percent change calculations
+
+### Other Data Sources Worth Exploring
+
+| Dataset | Source | Notes |
+|---------|--------|-------|
+| State Highway Bridges | [data.ca.gov](https://data.ca.gov/dataset/state-highway-bridges) | Caltrans-specific bridge view (~13K records), complements NBI |
+| Local Bridges | [data.ca.gov](https://data.ca.gov/dataset/local-bridges) | City/county bridges (~12.6K records), UNION with state bridges |
+| PeMS Traffic | [pems.dot.ca.gov](https://pems.dot.ca.gov/) | Real-time + historical from 39K detectors. Requires free account |
+| Crash Summaries (SHS) | [data.ca.gov](https://data.ca.gov/dataset/2023-crash-data-on-state-highway-system) | Curated annual summaries, small and clean |
+| HPMS | [FHWA](https://www.fhwa.dot.gov/policyinformation/hpms/shapefiles.cfm) | Highway performance data with pavement condition (IRI) |
+| LTPP | [infopave.fhwa.dot.gov](https://infopave.fhwa.dot.gov/) | Pavement performance data - highly relevant to construction engineering |
+| Freight (FAF) | [bts.gov/faf](https://www.bts.gov/faf) | Freight flows by origin/destination/commodity/mode |
+| Bottlenecks | [data.ca.gov](https://data.ca.gov/dataset/bottlenecks) | Freeway congestion bottleneck locations |
+| Named Highways | [data.ca.gov](https://data.ca.gov/organization/caltrans) | Named freeways, highways, and structures in CA |
 
 ## Exercises
 
@@ -89,7 +131,10 @@ caltransql/
 │   ├── 01-bridges.sql
 │   ├── 02-construction-projects.sql
 │   ├── 03-contracts.sql
-│   └── 04-traffic-counts.sql
+│   ├── 04-traffic-counts.sql
+│   ├── 05-truck-traffic.sql
+│   ├── 06-crash-data.sql
+│   └── 07-construction-cost-index.sql
 ├── exercises/                  # SQL practice files
 │   ├── 01-basics/
 │   ├── 02-filtering/
