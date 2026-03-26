@@ -3,8 +3,9 @@
 # Load downloaded CSV data into PostgreSQL
 # ============================================================
 # Prerequisites:
-#   1. Docker containers running (docker compose up -d)
+#   1. Database created (./scripts/setup-database.sh)
 #   2. Data files downloaded (./scripts/download-data.sh)
+#   3. psql CLI installed locally
 #
 # Usage:
 #   ./scripts/load-data.sh
@@ -12,39 +13,47 @@
 
 set -euo pipefail
 
-# Database connection (matches docker-compose.yml defaults)
-DB_CONTAINER="caltransql-postgres"
-DB_NAME="caltransql"
-DB_USER="caltrans"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+DATA_DIR="$REPO_DIR/data"
 
-DATA_DIR="$(cd "$(dirname "$0")/../data" && pwd)"
-
-run_sql() {
-    docker exec -i "$DB_CONTAINER" psql -U "$DB_USER" -d "$DB_NAME" "$@"
-}
-
-run_sql_file() {
-    docker exec -i "$DB_CONTAINER" psql -U "$DB_USER" -d "$DB_NAME" -f "$1"
-}
-
-echo "=== Loading data into PostgreSQL ==="
-echo ""
-
-# Check if container is running
-if ! docker ps --format '{{.Names}}' | grep -q "$DB_CONTAINER"; then
-    echo "ERROR: Container '$DB_CONTAINER' is not running."
-    echo "Start it with: docker compose up -d"
+# Load connection settings from .env
+if [ -f "$REPO_DIR/.env" ]; then
+    set -a
+    source "$REPO_DIR/.env"
+    set +a
+else
+    echo "ERROR: .env file not found. Copy .env.example to .env and configure it."
     exit 1
 fi
 
-# Create schemas (idempotent - uses IF NOT EXISTS)
-echo "Creating tables..."
-for schema_file in /docker-entrypoint-initdb.d/*.sql; do
-    echo "  Running: $(basename "$schema_file")"
-    run_sql < "/home/user/caltransql/schemas/$(basename "$schema_file")" 2>/dev/null || true
-done
+run_sql() {
+    psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d "$PGDATABASE" "$@"
+}
 
-# Wait for schemas to be created
+echo "=== Loading data into PostgreSQL ==="
+echo "Server: $PGHOST:$PGPORT/$PGDATABASE"
+echo ""
+
+# Check psql is available
+if ! command -v psql &>/dev/null; then
+    echo "ERROR: psql not found. Install it with: brew install libpq"
+    exit 1
+fi
+
+# Check connectivity
+if ! run_sql -c "SELECT 1;" &>/dev/null; then
+    echo "ERROR: Cannot connect to $PGDATABASE at $PGHOST:$PGPORT"
+    echo "Run ./scripts/setup-database.sh first."
+    exit 1
+fi
+
+# Ensure schemas exist
+echo "Creating tables (if needed)..."
+for schema_file in "$REPO_DIR"/schemas/*.sql; do
+    echo "  Running: $(basename "$schema_file")"
+    run_sql -f "$schema_file" 2>&1 | grep -v "^NOTICE:" || true
+done
 echo ""
 
 # ------------------------------------------------------------
@@ -52,27 +61,16 @@ echo ""
 # ------------------------------------------------------------
 NBI_FILE="$DATA_DIR/nbi_california.csv"
 if [ -f "$NBI_FILE" ]; then
-    echo "Loading NBI bridge data..."
-    # NBI data is pipe-delimited or comma-delimited depending on year
-    # We'll use a Python helper for flexible parsing
-    echo "  Note: NBI data format varies by year."
-    echo "  If auto-loading fails, use the Python loader:"
-    echo "    python3 scripts/load_nbi.py"
-
-    # Try simple COPY (works for comma-delimited files with headers)
-    docker cp "$NBI_FILE" "$DB_CONTAINER:/tmp/nbi_data.csv"
-    run_sql <<'SQL'
-        -- Truncate to allow re-runs
-        TRUNCATE TABLE bridges;
-
-        -- Try loading (adjust delimiter if needed)
-        \COPY bridges FROM '/tmp/nbi_data.csv' WITH (FORMAT csv, HEADER true, NULL '');
-SQL
+    echo "Loading NBI bridge data (staging + transform)..."
+    # The load-nbi.sql script uses \COPY with a relative path,
+    # so we run psql from the repo root
+    cd "$REPO_DIR"
+    run_sql -f "$REPO_DIR/scripts/load-nbi.sql"
     if [ $? -eq 0 ]; then
         BRIDGE_COUNT=$(run_sql -t -c "SELECT COUNT(*) FROM bridges;" | tr -d ' ')
         echo "  Loaded $BRIDGE_COUNT bridges."
     else
-        echo "  Auto-load failed. Try the Python loader or adjust the format."
+        echo "  Load failed. Check scripts/load-nbi.sql for details."
     fi
 else
     echo "Skipping NBI data (file not found: $NBI_FILE)"
@@ -82,7 +80,5 @@ fi
 echo ""
 echo "=== Data loading complete ==="
 echo ""
-echo "Connect to the database:"
-echo "  pgAdmin: http://localhost:8080"
-echo "  NocoDB:  http://localhost:8090"
-echo "  psql:    docker exec -it $DB_CONTAINER psql -U $DB_USER -d $DB_NAME"
+echo "Connect with DataGrip or psql:"
+echo "  psql -h $PGHOST -p $PGPORT -U $PGUSER -d $PGDATABASE"

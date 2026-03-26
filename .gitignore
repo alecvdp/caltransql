@@ -3,6 +3,7 @@
 
 # Data files (can be large CSVs)
 data/*.csv
+data/*.xlsx
 data/*.zip
 data/*.gz
 

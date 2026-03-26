@@ -1,16 +1,22 @@
 # CaltransSQL
 
-A hands-on SQL practice environment using real California transportation data. Built around PostgreSQL with pgAdmin and NocoDB for exploring data visually.
+A hands-on SQL practice environment using real California transportation data. Uses a remote PostgreSQL server with JetBrains DataGrip as the query editor.
+
+## Prerequisites
+
+- **PostgreSQL server** accessible on your network
+- **JetBrains DataGrip** (or any SQL client)
+- **psql CLI** for running setup scripts (`brew install libpq` on macOS, then add to PATH)
 
 ## Quick Start
 
 ```bash
 # 1. Clone and configure
 cp .env.example .env
-# Edit .env to set your passwords
+# Edit .env with your server connection details
 
-# 2. Start the database stack
-docker compose up -d
+# 2. Create the database and tables
+./scripts/setup-database.sh
 
 # 3. Download public datasets
 ./scripts/download-data.sh
@@ -19,24 +25,17 @@ docker compose up -d
 ./scripts/load-data.sh
 ```
 
-## Services
+## Connecting DataGrip
 
-| Service  | URL                    | Description              |
-|----------|------------------------|--------------------------|
-| pgAdmin  | http://localhost:8080   | SQL query editor & admin |
-| NocoDB   | http://localhost:8090   | Spreadsheet-style DB UI  |
-| Postgres | localhost:5432         | Direct database access   |
-
-### Connecting pgAdmin to the database
-
-1. Open http://localhost:8080
-2. Log in with your `PGADMIN_EMAIL` / `PGADMIN_PASSWORD`
-3. Add a new server:
-   - **Name:** CaltransSQL
-   - **Host:** `postgres` (the Docker service name)
-   - **Port:** `5432`
-   - **Username:** `caltrans`
-   - **Password:** your `POSTGRES_PASSWORD`
+1. Open DataGrip and click **+** > **Data Source** > **PostgreSQL**
+2. Fill in the connection settings from your `.env`:
+   - **Host:** your server IP
+   - **Port:** your server port
+   - **Database:** `caltransql`
+   - **User:** your username
+   - **Password:** your password
+3. Click **Test Connection**, then **OK**
+4. Open exercise `.sql` files directly in DataGrip and run queries with Ctrl+Enter (Cmd+Enter on Mac)
 
 ## Datasets
 
@@ -112,22 +111,65 @@ Work through the exercises in order. Each file has examples to study, then quest
 
 | #  | Topic               | Folder                  | Skill Level        |
 |----|---------------------|-------------------------|--------------------|
-| 01 | SELECT basics       | `exercises/01-basics/`  | Beginner           |
-| 02 | WHERE, LIKE, IN     | `exercises/02-filtering/` | Beginner         |
-| 03 | GROUP BY, HAVING    | `exercises/03-aggregations/` | Beginner/Intermediate |
-| 04 | JOINs               | `exercises/04-joins/`   | Intermediate       |
-| 05 | Subqueries          | `exercises/05-subqueries/` | Intermediate    |
-| 06 | Window Functions    | `exercises/06-window-functions/` | Intermediate/Advanced |
-| 07 | CTEs                | `exercises/07-ctes/`    | Intermediate/Advanced |
+| 01 | SELECT basics, ORDER BY, LIMIT | `exercises/01-basics/`  | Beginner |
+| 02 | WHERE, LIKE, IN, CASE, NULL handling | `exercises/02-filtering/` | Beginner |
+| 03 | GROUP BY, HAVING, conditional aggregation | `exercises/03-aggregations/` | Beginner/Intermediate |
+| 04 | JOINs and join grain | `exercises/04-joins/`   | Intermediate |
+| 05 | Subqueries, EXISTS, NOT EXISTS | `exercises/05-subqueries/` | Intermediate |
+| 06 | Window Functions, running totals, percentiles | `exercises/06-window-functions/` | Intermediate/Advanced |
+| 07 | CTEs and multi-step analysis | `exercises/07-ctes/`    | Intermediate/Advanced |
 | 08 | Practice Projects   | `exercises/08-practice-projects/` | All levels  |
+
+### Recently Added Exercises
+
+- `exercises/01-basics/02-order-by-limit.sql`
+- `exercises/02-filtering/03-case-and-null-handling.sql`
+- `exercises/03-aggregations/02-conditional-aggregation.sql`
+- `exercises/04-joins/02-join-grain-and-duplicates.sql`
+- `exercises/05-subqueries/02-exists-and-not-exists.sql`
+- `exercises/06-window-functions/02-running-stats-and-percentiles.sql`
+- `exercises/07-ctes/02-multi-step-analysis.sql`
+
+### Expanded Practice Projects
+
+- `exercises/08-practice-projects/01-bridge-report-card.sql`
+  Broad bridge inventory analysis using the core `bridges` table.
+- `exercises/08-practice-projects/02-contractor-performance.sql`
+  Contractor scorecards, estimate comparisons, and spend concentration.
+- `exercises/08-practice-projects/03-corridor-traffic-safety.sql`
+  Corridor-level traffic, truck exposure, and crash pattern analysis.
+- `exercises/08-practice-projects/04-inflation-adjusted-costs.sql`
+  Adjust historical contract values using the highway construction cost index.
+
+## Hints and Answer Keys
+
+- All exercise and project files in `exercises/` now have companion files in the same folder:
+  `*-hints.sql` and `*-answers.sql`
+- Use the main `.sql` file first, then open the hint file only if you are stuck.
+- The answer key files show one valid approach. They are not the only correct solutions.
+- The practice project answer files are sample solutions for key deliverables rather than exhaustive solutions to every sub-step.
+
+## Suggested Learning Path
+
+1. Start with `01-basics` and `02-filtering` until writing SELECT/WHERE queries feels automatic.
+2. Move into `03-aggregations` and `04-joins` to learn row-level vs grouped thinking.
+3. Use `05-subqueries`, `06-window-functions`, and `07-ctes` to solve the same question in multiple ways.
+4. After that, pick one practice project and treat it like a mini analysis assignment:
+   define the business question, build a clean base dataset, then produce a final summary table.
+
+## How to Use the Projects
+
+- Treat each project file like a guided notebook rather than a quiz.
+- Write your solution under each prompt, then rerun and refine it.
+- Save especially useful final queries as views so you can build on them later.
+- For the more advanced projects, sketch the table grain first so you do not accidentally multiply rows with the wrong join.
 
 ## Project Structure
 
 ```
 caltransql/
-├── docker-compose.yml          # PostgreSQL + pgAdmin + NocoDB
-├── .env.example                # Environment variable template
-├── schemas/                    # Table definitions (auto-run on first start)
+├── .env.example                # Connection settings template
+├── schemas/                    # Table definitions
 │   ├── 01-bridges.sql
 │   ├── 02-construction-projects.sql
 │   ├── 03-contracts.sql
@@ -145,14 +187,15 @@ caltransql/
 │   ├── 07-ctes/
 │   └── 08-practice-projects/
 ├── data/                       # Downloaded CSV files (git-ignored)
-└── scripts/                    # Data download & loading scripts
-    ├── download-data.sh
-    └── load-data.sh
+└── scripts/
+    ├── setup-database.sh       # Create database and tables
+    ├── download-data.sh        # Fetch public datasets
+    └── load-data.sh            # Load CSVs into PostgreSQL
 ```
 
 ## Tips
 
-- **pgAdmin query tool:** Right-click your database > Query Tool to open a SQL editor
-- **Run one query at a time:** Highlight a single query and press F5
-- **NocoDB** is great for browsing data visually before writing queries
-- **psql from terminal:** `docker exec -it caltransql-postgres psql -U caltrans -d caltransql`
+- **DataGrip:** Open `.sql` files from the `exercises/` folder directly. Highlight a query and press Ctrl+Enter (Cmd+Enter) to run it.
+- **Run one query at a time:** Highlight a single statement before executing
+- **psql from terminal:** `psql -h $PGHOST -p $PGPORT -U $PGUSER -d $PGDATABASE`
+- **Schema explorer:** Use DataGrip's database tree to browse tables, columns, and relationships
