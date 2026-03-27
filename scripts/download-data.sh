@@ -81,10 +81,13 @@ echo ""
 # Annual Average Daily Traffic across the highway system
 # ------------------------------------------------------------
 echo "=== 4. Traffic Volumes AADT ==="
-echo "   Source: data.ca.gov"
-echo "  MANUAL: Visit https://data.ca.gov/dataset/annual-average-daily-traffic"
-echo "          Click 'Download' on the CSV file"
-echo "          Save as: $DATA_DIR/traffic_aadt.csv"
+echo "   Source: data.ca.gov / Caltrans GIS"
+AADT_URL="https://gis.data.ca.gov/api/download/v1/items/d8833219913c44358f2a9a71bda57f76/csv?layers=0"
+download_file "$AADT_URL" "$DATA_DIR/traffic_aadt.csv" "Traffic Volumes AADT" || {
+    echo "  Manual: Visit https://lab.data.ca.gov/dataset/annual-average-daily-traffic"
+    echo "          Click Download > CSV"
+    echo "          Save as: $DATA_DIR/traffic_aadt.csv"
+}
 echo ""
 
 # ------------------------------------------------------------
@@ -93,10 +96,13 @@ echo ""
 # Relevant for pavement design (EAL data)
 # ------------------------------------------------------------
 echo "=== 5. Truck Volumes AADT ==="
-echo "   Source: data.ca.gov"
-echo "  MANUAL: Visit https://gisdata-caltrans.opendata.arcgis.com/datasets/c079bdd6a2c54aec84b6b2f7d6570f6d_0/about"
-echo "          Download as CSV"
-echo "          Save as: $DATA_DIR/truck_aadt.csv"
+echo "   Source: data.ca.gov / Caltrans GIS"
+TRUCK_AADT_URL="https://gis.data.ca.gov/api/download/v1/items/c079bdd6a2c54aec84b6b2f7d6570f6d/csv?layers=0"
+download_file "$TRUCK_AADT_URL" "$DATA_DIR/truck_aadt.csv" "Truck Volumes AADT" || {
+    echo "  Manual: Visit https://lab.data.ca.gov/dataset/truck-average-daily-traffic"
+    echo "          Click Download > CSV"
+    echo "          Save as: $DATA_DIR/truck_aadt.csv"
+}
 echo ""
 
 # ------------------------------------------------------------
