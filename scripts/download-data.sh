@@ -33,6 +33,7 @@ download_file() {
         echo "  Saved to: $(basename "$dest")"
         return 0
     else
+        rm -f "$dest"
         echo "  WARNING: Download failed. See manual instructions below."
         return 1
     fi

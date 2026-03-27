@@ -14,7 +14,7 @@
 DROP TABLE IF EXISTS traffic_counts_staging;
 DROP TABLE IF EXISTS truck_traffic_staging;
 
-CREATE TABLE traffic_counts_staging (
+CREATE TEMP TABLE traffic_counts_staging (
     objectid TEXT,
     district TEXT,
     rte TEXT,
@@ -32,7 +32,7 @@ CREATE TABLE traffic_counts_staging (
     ahead_aadt TEXT
 );
 
-CREATE TABLE truck_traffic_staging (
+CREATE TEMP TABLE truck_traffic_staging (
     objectid TEXT,
     rte TEXT,
     rte_sfx TEXT,
@@ -62,9 +62,9 @@ CREATE TABLE truck_traffic_staging (
 \COPY traffic_counts_staging FROM 'data/traffic_aadt.csv' WITH (FORMAT csv, HEADER true, NULL '');
 \COPY truck_traffic_staging FROM 'data/truck_aadt.csv' WITH (FORMAT csv, HEADER true, NULL '');
 
--- Flexible numeric parsing helpers.
-DROP FUNCTION IF EXISTS parse_int(TEXT);
-CREATE FUNCTION parse_int(v TEXT)
+-- Flexible numeric parsing helpers (created in pg_temp so they auto-drop at session end).
+DROP FUNCTION IF EXISTS pg_temp.parse_int(TEXT);
+CREATE FUNCTION pg_temp.parse_int(v TEXT)
 RETURNS INTEGER
 LANGUAGE SQL
 IMMUTABLE
@@ -77,8 +77,8 @@ AS $$
     END;
 $$;
 
-DROP FUNCTION IF EXISTS parse_dec(TEXT);
-CREATE FUNCTION parse_dec(v TEXT)
+DROP FUNCTION IF EXISTS pg_temp.parse_dec(TEXT);
+CREATE FUNCTION pg_temp.parse_dec(v TEXT)
 RETURNS DECIMAL
 LANGUAGE SQL
 IMMUTABLE
@@ -93,7 +93,11 @@ $$;
 
 -- Traffic AADT source currently publishes one snapshot year.
 -- Allow override from shell: TRAFFIC_COUNT_YEAR=2025 ./scripts/load-data.sh
-\set traffic_count_year `bash -lc 'echo ${TRAFFIC_COUNT_YEAR:-2025}'`
+\getenv traffic_count_year TRAFFIC_COUNT_YEAR
+\if :{?traffic_count_year}
+\else
+\set traffic_count_year 2025
+\endif
 
 INSERT INTO traffic_counts (
     station_id,
@@ -118,12 +122,10 @@ SELECT
                 '|',
                 NULLIF(TRIM(rte), ''),
                 NULLIF(TRIM(rte_sfx), ''),
-                NULLIF(TRIM(district), ''),
                 NULLIF(TRIM(cnty), ''),
                 NULLIF(TRIM(pm_pfx), ''),
                 NULLIF(TRIM(pm), ''),
-                NULLIF(TRIM(pm_sfx), ''),
-                NULLIF(TRIM(description), '')
+                NULLIF(TRIM(pm_sfx), '')
             )
         ),
         20
@@ -132,10 +134,10 @@ SELECT
     NULLIF(TRIM(district), ''),
     NULLIF(TRIM(cnty), ''),
     NULLIF(TRIM(rte), ''),
-    parse_dec(pm)::DECIMAL(8, 3),
+    pg_temp.parse_dec(pm)::DECIMAL(8, 3),
     NULLIF(TRIM(description), ''),
-    parse_int(ahead_aadt),
-    parse_int(ahead_peak_madt),
+    pg_temp.parse_int(ahead_aadt),
+    pg_temp.parse_int(ahead_peak_madt),
     NULLIF(TRIM(ahead_peak_hour), ''),
     NULL,
     NULL,
@@ -187,38 +189,36 @@ SELECT
                 '|',
                 NULLIF(TRIM(rte), ''),
                 NULLIF(TRIM(rte_sfx), ''),
-                NULLIF(TRIM(dist), ''),
                 NULLIF(TRIM(cnty), ''),
                 NULLIF(TRIM(pm_pfx), ''),
                 NULLIF(TRIM(postmile), ''),
-                NULLIF(TRIM(pm_sfx), ''),
-                NULLIF(TRIM(leg), '')
+                NULLIF(TRIM(pm_sfx), '')
             )
         ),
         20
     ) AS station_id,
-    parse_int(est_year) AS count_year,
+    pg_temp.parse_int(est_year) AS count_year,
     NULLIF(TRIM(dist), ''),
     NULLIF(TRIM(cnty), ''),
     NULLIF(TRIM(rte), ''),
-    parse_dec(postmile)::DECIMAL(8, 3),
+    pg_temp.parse_dec(postmile)::DECIMAL(8, 3),
     NULLIF(TRIM(description), ''),
-    parse_int(vehicle_aadt_total),
-    parse_int(tot_trk_aadt),
-    parse_dec(trk_percent_tot)::DECIMAL(5, 2),
-    parse_int(trk_2_axle),
-    parse_dec(trk_2_axle_pct)::DECIMAL(5, 2),
-    parse_int(trk_3_axle),
-    parse_dec(trk_3_axle_pct)::DECIMAL(5, 2),
-    parse_int(trk_4_axle),
-    parse_dec(trk_4_axle_pct)::DECIMAL(5, 2),
-    parse_int(trk_5_axle),
-    parse_dec(trk_5_axle_pct)::DECIMAL(5, 2),
-    parse_dec(eal)::DECIMAL(15, 2),
+    pg_temp.parse_int(vehicle_aadt_total),
+    pg_temp.parse_int(tot_trk_aadt),
+    pg_temp.parse_dec(trk_percent_tot)::DECIMAL(5, 2),
+    pg_temp.parse_int(trk_2_axle),
+    pg_temp.parse_dec(trk_2_axle_pct)::DECIMAL(5, 2),
+    pg_temp.parse_int(trk_3_axle),
+    pg_temp.parse_dec(trk_3_axle_pct)::DECIMAL(5, 2),
+    pg_temp.parse_int(trk_4_axle),
+    pg_temp.parse_dec(trk_4_axle_pct)::DECIMAL(5, 2),
+    pg_temp.parse_int(trk_5_axle),
+    pg_temp.parse_dec(trk_5_axle_pct)::DECIMAL(5, 2),
+    pg_temp.parse_dec(eal)::DECIMAL(15, 2),
     NULL,
     NULL
 FROM truck_traffic_staging
-WHERE parse_int(est_year) IS NOT NULL
+WHERE pg_temp.parse_int(est_year) IS NOT NULL
 ON CONFLICT (station_id, count_year) DO UPDATE SET
     district = EXCLUDED.district,
     county = EXCLUDED.county,
@@ -246,5 +246,5 @@ SELECT 'truck_traffic', COUNT(*)::BIGINT FROM truck_traffic;
 
 DROP TABLE IF EXISTS traffic_counts_staging;
 DROP TABLE IF EXISTS truck_traffic_staging;
-DROP FUNCTION IF EXISTS parse_int(TEXT);
-DROP FUNCTION IF EXISTS parse_dec(TEXT);
+DROP FUNCTION IF EXISTS pg_temp.parse_int(TEXT);
+DROP FUNCTION IF EXISTS pg_temp.parse_dec(TEXT);

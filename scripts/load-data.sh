@@ -86,8 +86,7 @@ TRUCK_FILE="$DATA_DIR/truck_aadt.csv"
 if [ -f "$TRAFFIC_FILE" ] && [ -f "$TRUCK_FILE" ]; then
     echo "Loading AADT + truck traffic data (staging + transform + upsert)..."
     cd "$REPO_DIR"
-    run_sql -f "$REPO_DIR/scripts/load-traffic.sql"
-    if [ $? -eq 0 ]; then
+    if run_sql -v ON_ERROR_STOP=1 -f "$REPO_DIR/scripts/load-traffic.sql"; then
         TRAFFIC_COUNT=$(run_sql -t -c "SELECT COUNT(*) FROM traffic_counts;" | tr -d ' ')
         TRUCK_COUNT=$(run_sql -t -c "SELECT COUNT(*) FROM truck_traffic;" | tr -d ' ')
         echo "  Loaded traffic_counts=$TRAFFIC_COUNT truck_traffic=$TRUCK_COUNT"
