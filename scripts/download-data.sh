@@ -135,12 +135,32 @@ echo ""
 # ------------------------------------------------------------
 echo "=== 8. California Crash Data (CCRS) ==="
 echo "   Source: data.ca.gov - https://data.ca.gov/dataset/ccrs"
-echo "  MANUAL: Visit the URL above"
-echo "          Download Crashes, Parties, and InjuredWitnessPassengers CSVs"
-echo "          Save as: $DATA_DIR/ccrs_crashes.csv"
-echo "                   $DATA_DIR/ccrs_parties.csv"
-echo "                   $DATA_DIR/ccrs_victims.csv"
-echo "  Note: Start with one year of data to keep sizes manageable."
+
+# Stable direct resource URLs from data.ca.gov CKAN dataset page.
+# Default to the latest full year snapshot to avoid partial in-progress-year data.
+CCRS_YEAR="${CCRS_YEAR:-2024}"
+case "$CCRS_YEAR" in
+    2024)
+        CCRS_CRASHES_URL="https://data.ca.gov/dataset/80c6a49d-c6b3-40ba-86d8-379c9741b4be/resource/f775df59-b89b-4f82-bd3d-8807fa3a22a0/download/hq1d-p-app52dopendataexport2024crashes.csv"
+        CCRS_PARTIES_URL="https://data.ca.gov/dataset/80c6a49d-c6b3-40ba-86d8-379c9741b4be/resource/93892d36-017b-4a2a-bc0b-f1f385060b96/download/hq1d-p-app52dopendataexport2024parties.csv"
+        CCRS_VICTIMS_URL="https://data.ca.gov/dataset/80c6a49d-c6b3-40ba-86d8-379c9741b4be/resource/a36a0078-d7e1-4244-8337-0a59433c9b84/download/hq1d-p-app52dopendataexport2024injuredwitnesspassengers.csv"
+        ;;
+    *)
+        echo "  WARNING: Unsupported CCRS_YEAR=$CCRS_YEAR for auto-download."
+        echo "           Use CCRS_YEAR=2024 or download manually from data.ca.gov/dataset/ccrs"
+        CCRS_CRASHES_URL=""
+        CCRS_PARTIES_URL=""
+        CCRS_VICTIMS_URL=""
+        ;;
+esac
+
+if [ -n "$CCRS_CRASHES_URL" ]; then
+    download_file "$CCRS_CRASHES_URL" "$DATA_DIR/ccrs_crashes.csv" "CCRS Crashes ($CCRS_YEAR)" || true
+    download_file "$CCRS_PARTIES_URL" "$DATA_DIR/ccrs_parties.csv" "CCRS Parties ($CCRS_YEAR)" || true
+    download_file "$CCRS_VICTIMS_URL" "$DATA_DIR/ccrs_victims.csv" "CCRS Victims ($CCRS_YEAR)" || true
+fi
+
+echo "  If any file failed, manual fallback: https://data.ca.gov/dataset/ccrs"
 echo ""
 
 # ------------------------------------------------------------
