@@ -77,6 +77,32 @@ else
     echo "  Run ./scripts/download-data.sh first"
 fi
 
+# ------------------------------------------------------------
+# Load CCRS crash data
+# ------------------------------------------------------------
+CCRS_CRASHES_FILE="$DATA_DIR/ccrs_crashes.csv"
+CCRS_PARTIES_FILE="$DATA_DIR/ccrs_parties.csv"
+CCRS_VICTIMS_FILE="$DATA_DIR/ccrs_victims.csv"
+if [ -f "$CCRS_CRASHES_FILE" ] && [ -f "$CCRS_PARTIES_FILE" ] && [ -f "$CCRS_VICTIMS_FILE" ]; then
+    echo "Loading CCRS crash data (staging + transform + validation)..."
+    cd "$REPO_DIR"
+    run_sql -f "$REPO_DIR/scripts/load-ccrs.sql"
+    if [ $? -eq 0 ]; then
+        CRASH_COUNT=$(run_sql -t -c "SELECT COUNT(*) FROM crashes;" | tr -d ' ')
+        PARTY_COUNT=$(run_sql -t -c "SELECT COUNT(*) FROM crash_parties;" | tr -d ' ')
+        VICTIM_COUNT=$(run_sql -t -c "SELECT COUNT(*) FROM crash_victims;" | tr -d ' ')
+        echo "  Loaded crashes=$CRASH_COUNT parties=$PARTY_COUNT victims=$VICTIM_COUNT"
+    else
+        echo "  CCRS load failed. Check scripts/load-ccrs.sql for details."
+    fi
+else
+    echo "Skipping CCRS data (missing one or more files):"
+    echo "  $CCRS_CRASHES_FILE"
+    echo "  $CCRS_PARTIES_FILE"
+    echo "  $CCRS_VICTIMS_FILE"
+    echo "  Run ./scripts/download-data.sh first"
+fi
+
 echo ""
 echo "=== Data loading complete ==="
 echo ""
