@@ -244,7 +244,7 @@ SELECT 'traffic_counts' AS table_name, COUNT(*)::BIGINT AS row_count FROM traffi
 UNION ALL
 SELECT 'truck_traffic', COUNT(*)::BIGINT FROM truck_traffic;
 
-DROP TABLE traffic_counts_staging;
-DROP TABLE truck_traffic_staging;
-DROP FUNCTION parse_int(TEXT);
-DROP FUNCTION parse_dec(TEXT);
+DROP TABLE IF EXISTS traffic_counts_staging;
+DROP TABLE IF EXISTS truck_traffic_staging;
+DROP FUNCTION IF EXISTS parse_int(TEXT);
+DROP FUNCTION IF EXISTS parse_dec(TEXT);
