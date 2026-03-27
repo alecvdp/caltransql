@@ -77,6 +77,29 @@ else
     echo "  Run ./scripts/download-data.sh first"
 fi
 
+
+# ------------------------------------------------------------
+# Load AADT traffic data
+# ------------------------------------------------------------
+TRAFFIC_FILE="$DATA_DIR/traffic_aadt.csv"
+TRUCK_FILE="$DATA_DIR/truck_aadt.csv"
+if [ -f "$TRAFFIC_FILE" ] && [ -f "$TRUCK_FILE" ]; then
+    echo "Loading AADT + truck traffic data (staging + transform + upsert)..."
+    cd "$REPO_DIR"
+    if run_sql -v ON_ERROR_STOP=1 -f "$REPO_DIR/scripts/load-traffic.sql"; then
+        TRAFFIC_COUNT=$(run_sql -t -c "SELECT COUNT(*) FROM traffic_counts;" | tr -d ' ')
+        TRUCK_COUNT=$(run_sql -t -c "SELECT COUNT(*) FROM truck_traffic;" | tr -d ' ')
+        echo "  Loaded traffic_counts=$TRAFFIC_COUNT truck_traffic=$TRUCK_COUNT"
+    else
+        echo "  Traffic load failed. Check scripts/load-traffic.sql for details."
+    fi
+else
+    echo "Skipping traffic data (missing one or more files):"
+    echo "  $TRAFFIC_FILE"
+    echo "  $TRUCK_FILE"
+    echo "  Run ./scripts/download-data.sh first"
+fi
+
 # ------------------------------------------------------------
 # Load CCRS crash data
 # ------------------------------------------------------------
