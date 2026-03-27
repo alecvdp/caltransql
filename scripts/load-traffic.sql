@@ -93,7 +93,13 @@ $$;
 
 -- Traffic AADT source currently publishes one snapshot year.
 -- Allow override from shell: TRAFFIC_COUNT_YEAR=2025 ./scripts/load-data.sh
-\set traffic_count_year `bash -lc 'echo ${TRAFFIC_COUNT_YEAR:-2025}'`
+\getenv traffic_count_year TRAFFIC_COUNT_YEAR
+\if :{?traffic_count_year}
+-- traffic_count_year was set from the environment
+\else
+-- TRAFFIC_COUNT_YEAR not set; use default
+\set traffic_count_year 2025
+\endif
 
 INSERT INTO traffic_counts (
     station_id,
