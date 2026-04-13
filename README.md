@@ -23,6 +23,9 @@ cp .env.example .env
 
 # 4. Load data into PostgreSQL
 ./scripts/load-data.sh
+
+# 5. Validate the loaded data
+./scripts/validate-data.sh
 ```
 
 ## Connecting DataGrip
@@ -190,7 +193,9 @@ caltransql/
 └── scripts/
     ├── setup-database.sh       # Create database and tables
     ├── download-data.sh        # Fetch public datasets
-    └── load-data.sh            # Load CSVs into PostgreSQL
+    ├── load-data.sh            # Load CSVs into PostgreSQL
+    ├── validate-data.sh        # Data health check (shell wrapper)
+    └── validate-data.sql       # Data health check (SQL queries)
 ```
 
 ## Tips
