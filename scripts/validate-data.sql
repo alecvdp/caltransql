@@ -223,7 +223,8 @@ FROM (
     SELECT COUNT(*) AS orphan_count
     FROM crash_parties cp
     LEFT JOIN crashes c ON c.case_id = cp.case_id
-    WHERE c.case_id IS NULL
+    WHERE cp.case_id IS NOT NULL
+      AND c.case_id IS NULL
 ) t;
 
 -- crash_victims.case_id -> crashes.case_id
@@ -237,7 +238,8 @@ FROM (
     SELECT COUNT(*) AS orphan_count
     FROM crash_victims v
     LEFT JOIN crashes c ON c.case_id = v.case_id
-    WHERE c.case_id IS NULL
+    WHERE v.case_id IS NOT NULL
+      AND c.case_id IS NULL
 ) t;
 
 -- crash_victims.party_id -> crash_parties.party_id
