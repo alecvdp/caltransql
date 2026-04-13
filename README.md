@@ -109,16 +109,17 @@ cp .env.example .env
 
 Work through the exercises in order. Each file has examples to study, then questions to solve on your own.
 
-| #  | Topic               | Folder                  | Skill Level        |
-|----|---------------------|-------------------------|--------------------|
-| 01 | SELECT basics, ORDER BY, LIMIT | `exercises/01-basics/`  | Beginner |
-| 02 | WHERE, LIKE, IN, CASE, NULL handling | `exercises/02-filtering/` | Beginner |
-| 03 | GROUP BY, HAVING, conditional aggregation | `exercises/03-aggregations/` | Beginner/Intermediate |
-| 04 | JOINs and join grain | `exercises/04-joins/`   | Intermediate |
-| 05 | Subqueries, EXISTS, NOT EXISTS | `exercises/05-subqueries/` | Intermediate |
-| 06 | Window Functions, running totals, percentiles | `exercises/06-window-functions/` | Intermediate/Advanced |
-| 07 | CTEs and multi-step analysis | `exercises/07-ctes/`    | Intermediate/Advanced |
-| 08 | Practice Projects   | `exercises/08-practice-projects/` | All levels  |
+| #   | Topic               | Folder                  | Skill Level        |
+|-----|---------------------|-------------------------|--------------------|
+| 01  | SELECT basics, ORDER BY, LIMIT | `exercises/01-basics/`  | Beginner |
+| 02  | WHERE, LIKE, IN, CASE, NULL handling | `exercises/02-filtering/` | Beginner |
+| 03  | GROUP BY, HAVING, conditional aggregation | `exercises/03-aggregations/` | Beginner/Intermediate |
+| 04  | JOINs and join grain | `exercises/04-joins/`   | Intermediate |
+| 04b | UNION, INTERSECT, EXCEPT, and self-joins | `exercises/04b-set-operations/` | Intermediate |
+| 05  | Subqueries, EXISTS, NOT EXISTS | `exercises/05-subqueries/` | Intermediate |
+| 06  | Window Functions, running totals, percentiles | `exercises/06-window-functions/` | Intermediate/Advanced |
+| 07  | CTEs and multi-step analysis | `exercises/07-ctes/`    | Intermediate/Advanced |
+| 08  | Practice Projects   | `exercises/08-practice-projects/` | All levels  |
 
 ### Recently Added Exercises
 
@@ -126,6 +127,8 @@ Work through the exercises in order. Each file has examples to study, then quest
 - `exercises/02-filtering/03-case-and-null-handling.sql`
 - `exercises/03-aggregations/02-conditional-aggregation.sql`
 - `exercises/04-joins/02-join-grain-and-duplicates.sql`
+- `exercises/04b-set-operations/01-union-and-set-operations.sql`
+- `exercises/04b-set-operations/02-self-joins.sql`
 - `exercises/05-subqueries/02-exists-and-not-exists.sql`
 - `exercises/06-window-functions/02-running-stats-and-percentiles.sql`
 - `exercises/07-ctes/02-multi-step-analysis.sql`
@@ -153,8 +156,9 @@ Work through the exercises in order. Each file has examples to study, then quest
 
 1. Start with `01-basics` and `02-filtering` until writing SELECT/WHERE queries feels automatic.
 2. Move into `03-aggregations` and `04-joins` to learn row-level vs grouped thinking.
-3. Use `05-subqueries`, `06-window-functions`, and `07-ctes` to solve the same question in multiple ways.
-4. After that, pick one practice project and treat it like a mini analysis assignment:
+3. Work through `04b-set-operations` to practice UNION, INTERSECT, EXCEPT, and self-joins.
+4. Use `05-subqueries`, `06-window-functions`, and `07-ctes` to solve the same question in multiple ways.
+5. After that, pick one practice project and treat it like a mini analysis assignment:
    define the business question, build a clean base dataset, then produce a final summary table.
 
 ## How to Use the Projects
@@ -182,6 +186,7 @@ caltransql/
 │   ├── 02-filtering/
 │   ├── 03-aggregations/
 │   ├── 04-joins/
+│   ├── 04b-set-operations/
 │   ├── 05-subqueries/
 │   ├── 06-window-functions/
 │   ├── 07-ctes/
