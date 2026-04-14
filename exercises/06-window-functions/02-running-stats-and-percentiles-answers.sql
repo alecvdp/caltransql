@@ -12,6 +12,14 @@ SELECT
     ) AS contractor_running_total
 FROM contracts
 ORDER BY contractor_name, award_date;
+-- Expected output (first 5 rows, illustrative):
+-- contractor_name | award_date | bid_amount | contractor_running_total
+-- ----------------+------------+------------+-------------------------
+-- Sample A        | 2024-01-15 | 10         | 10                      
+-- Sample B        | 2024-02-15 | 25         | 25                      
+-- Sample C        | 2024-03-15 | 42         | 42                      
+-- ...
+
 
 -- Q2
 WITH ranked_contracts AS (
@@ -30,6 +38,14 @@ SELECT *
 FROM ranked_contracts
 WHERE contract_rank <= 3
 ORDER BY contractor_name, contract_rank;
+-- Expected output (first 5 rows, illustrative):
+-- *             
+-- --------------
+-- <many columns>
+-- <many columns>
+-- <many columns>
+-- ...
+
 
 -- Q3
 WITH contract_quartiles AS (
@@ -43,6 +59,14 @@ SELECT bid_quartile, COUNT(*) AS contract_count
 FROM contract_quartiles
 GROUP BY bid_quartile
 ORDER BY bid_quartile;
+-- Expected output (first 5 rows, illustrative):
+-- bid_quartile | contract_count
+-- -------------+---------------
+-- Sample A     | 10            
+-- Sample B     | 25            
+-- Sample C     | 42            
+-- ...
+
 
 -- Q4
 SELECT
@@ -58,6 +82,14 @@ SELECT
     ) AS percent_change
 FROM construction_cost_index
 ORDER BY quarter_date;
+-- Expected output (first 5 rows, illustrative):
+-- quarter_date | nhcci_raw | previous_quarter_nhcci | absolute_change | percent_change
+-- -------------+-----------+------------------------+-----------------+---------------
+-- 2024-01-15   | Sample A  | Sample A               | Sample A        | 10            
+-- 2024-02-15   | Sample B  | Sample B               | Sample B        | 25            
+-- 2024-03-15   | Sample C  | Sample C               | Sample C        | 42            
+-- ...
+
 
 -- Q5
 WITH cci_changes AS (
@@ -71,6 +103,14 @@ SELECT *
 FROM cci_changes
 ORDER BY absolute_change DESC NULLS LAST
 LIMIT 1;
+-- Expected output (first 5 rows, illustrative):
+-- *             
+-- --------------
+-- <many columns>
+-- <many columns>
+-- <many columns>
+-- ...
+
 
 -- Q6
 SELECT
@@ -80,6 +120,14 @@ SELECT
     CUME_DIST() OVER (ORDER BY bid_amount) AS cume_dist_bid_amount
 FROM contracts
 ORDER BY bid_amount DESC NULLS LAST;
+-- Expected output (first 5 rows, illustrative):
+-- contract_id | bid_amount | percent_rank_bid_amount | cume_dist_bid_amount
+-- ------------+------------+-------------------------+---------------------
+-- ID-1000     | 10         | 10                      | 10                  
+-- ID-1001     | 25         | 25                      | 25                  
+-- ID-1002     | 42         | 42                      | 42                  
+-- ...
+
 
 -- Q7
 WITH contractor_totals AS (
@@ -98,6 +146,14 @@ SELECT
     ) AS pct_of_statewide_total
 FROM contractor_totals
 ORDER BY total_bid_amount DESC NULLS LAST;
+-- Expected output (first 5 rows, illustrative):
+-- contractor_name | total_bid_amount | pct_of_statewide_total
+-- ----------------+------------------+-----------------------
+-- Sample A        | 10               | 10                    
+-- Sample B        | 25               | 25                    
+-- Sample C        | 42               | 42                    
+-- ...
+
 
 -- Q8
 WITH contractor_summary AS (
@@ -119,3 +175,11 @@ SELECT
     ) AS pct_of_statewide_total
 FROM contractor_summary
 ORDER BY statewide_rank;
+-- Expected output (first 5 rows, illustrative):
+-- contractor_name | contract_count | total_bid_amount | statewide_rank | pct_of_statewide_total
+-- ----------------+----------------+------------------+----------------+-----------------------
+-- Sample A        | 10             | 10               | 10             | 10                    
+-- Sample B        | 25             | 25               | 25             | 25                    
+-- Sample C        | 42             | 42               | 42             | 42                    
+-- ...
+

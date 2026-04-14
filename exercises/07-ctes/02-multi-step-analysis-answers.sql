@@ -34,6 +34,14 @@ final AS (
 SELECT *
 FROM final
 ORDER BY project_cost_per_bridge DESC NULLS LAST;
+-- Expected output (first 5 rows, illustrative):
+-- *             
+-- --------------
+-- <many columns>
+-- <many columns>
+-- <many columns>
+-- ...
+
 
 -- Q2
 WITH contract_base AS (
@@ -67,6 +75,14 @@ SELECT *
 FROM ranked_contractors
 WHERE contractor_rank <= 15
 ORDER BY contractor_rank;
+-- Expected output (first 5 rows, illustrative):
+-- *             
+-- --------------
+-- <many columns>
+-- <many columns>
+-- <many columns>
+-- ...
+
 
 -- Q3
 WITH old_busy_bridges AS (
@@ -101,6 +117,14 @@ final AS (
 SELECT *
 FROM final
 LIMIT 30;
+-- Expected output (first 5 rows, illustrative):
+-- *             
+-- --------------
+-- <many columns>
+-- <many columns>
+-- <many columns>
+-- ...
+
 
 -- Q4
 WITH bridge_age_stats AS (
@@ -151,3 +175,11 @@ ranked_counties AS (
 SELECT *
 FROM ranked_counties
 ORDER BY risk_rank;
+-- Expected output (first 5 rows, illustrative):
+-- *             
+-- --------------
+-- <many columns>
+-- <many columns>
+-- <many columns>
+-- ...
+

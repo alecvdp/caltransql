@@ -51,6 +51,14 @@ SELECT
 FROM contractor_summary
 ORDER BY statewide_rank
 LIMIT 15;
+-- Expected output (first 5 rows, illustrative):
+-- contractor_name | contract_count | first_award_date | most_recent_award_date | total_bid_amount | avg_bid_amount | avg_bid_vs_estimate_pct | ...     
+-- ----------------+----------------+------------------+------------------------+------------------+----------------+-------------------------+---------
+-- Sample A        | 10             | 2024-01-15       | 2024-01-15             | 10               | 10             | 10                      | Sample A
+-- Sample B        | 25             | 2024-02-15       | 2024-02-15             | 25               | 25             | 25                      | Sample B
+-- Sample C        | 42             | 2024-03-15       | 2024-03-15             | 42               | 42             | 42                      | Sample C
+-- ...
+
 
 -- Deliverable 2: largest contract per contractor
 WITH contract_base AS (
@@ -86,6 +94,14 @@ SELECT
 FROM ranked_contracts
 WHERE contract_rank = 1
 ORDER BY bid_amount DESC NULLS LAST;
+-- Expected output (first 5 rows, illustrative):
+-- contractor_name | project_id | county      | work_type               | award_date | bid_amount
+-- ----------------+------------+-------------+-------------------------+------------+-----------
+-- Sample A        | ID-1000    | LOS ANGELES | Pavement Rehabilitation | 2024-01-15 | 10        
+-- Sample B        | ID-1001    | SAN DIEGO   | Bridge Repair           | 2024-02-15 | 25        
+-- Sample C        | ID-1002    | SACRAMENTO  | Safety Improvement      | 2024-03-15 | 42        
+-- ...
+
 
 -- Deliverable 3A: counties with most awarded dollars
 WITH contract_base AS (
@@ -106,6 +122,14 @@ SELECT
 FROM contract_base
 GROUP BY county
 ORDER BY total_bid_amount DESC NULLS LAST;
+-- Expected output (first 5 rows, illustrative):
+-- county      | contract_count | total_bid_amount
+-- ------------+----------------+-----------------
+-- LOS ANGELES | 10             | 10              
+-- SAN DIEGO   | 25             | 25              
+-- SACRAMENTO  | 42             | 42              
+-- ...
+
 
 -- Deliverable 3B: work types with highest average contract size
 WITH contract_base AS (
@@ -125,3 +149,11 @@ SELECT
 FROM contract_base
 GROUP BY work_type
 ORDER BY avg_bid_amount DESC NULLS LAST;
+-- Expected output (first 5 rows, illustrative):
+-- work_type               | contract_count | avg_bid_amount | total_bid_amount
+-- ------------------------+----------------+----------------+-----------------
+-- Pavement Rehabilitation | 10             | 10             | 10              
+-- Bridge Repair           | 25             | 25             | 25              
+-- Safety Improvement      | 42             | 42             | 42              
+-- ...
+

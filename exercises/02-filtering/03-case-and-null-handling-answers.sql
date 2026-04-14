@@ -13,6 +13,14 @@ SELECT
     END AS age_bucket
 FROM bridges
 LIMIT 20;
+-- Expected output (first 5 rows, illustrative):
+-- structure_number | county      | year_built | age_bucket
+-- -----------------+-------------+------------+-----------
+-- ID-1000          | LOS ANGELES | 1950       | Sample A  
+-- ID-1001          | SAN DIEGO   | 1965       | Sample B  
+-- ID-1002          | SACRAMENTO  | 1980       | Sample C  
+-- ...
+
 
 -- Q2
 SELECT
@@ -28,6 +36,14 @@ SELECT
     END AS traffic_bucket
 FROM bridges
 LIMIT 25;
+-- Expected output (first 5 rows, illustrative):
+-- structure_number | county      | adt | traffic_bucket
+-- -----------------+-------------+-----+---------------
+-- ID-1000          | LOS ANGELES | 10  | Sample A      
+-- ID-1001          | SAN DIEGO   | 25  | Sample B      
+-- ID-1002          | SACRAMENTO  | 42  | Sample C      
+-- ...
+
 
 -- Q3
 SELECT
@@ -39,6 +55,14 @@ SELECT
 FROM bridges
 ORDER BY effective_service_year DESC NULLS LAST
 LIMIT 20;
+-- Expected output (first 5 rows, illustrative):
+-- structure_number | county      | year_built | year_reconstructed | effective_service_year
+-- -----------------+-------------+------------+--------------------+-----------------------
+-- ID-1000          | LOS ANGELES | 1950       | 1950               | 1950                  
+-- ID-1001          | SAN DIEGO   | 1965       | 1965               | 1965                  
+-- ID-1002          | SACRAMENTO  | 1980       | 1980               | 1980                  
+-- ...
+
 
 -- Q4
 SELECT
@@ -53,11 +77,27 @@ SELECT
     END AS maintenance_priority
 FROM bridges
 LIMIT 25;
+-- Expected output (first 5 rows, illustrative):
+-- structure_number | county      | deck_condition | maintenance_priority
+-- -----------------+-------------+----------------+---------------------
+-- ID-1000          | LOS ANGELES | 10             | Sample A            
+-- ID-1001          | SAN DIEGO   | 25             | Sample B            
+-- ID-1002          | SACRAMENTO  | 42             | Sample C            
+-- ...
+
 
 -- Q5
 SELECT structure_number, county, facility_carried, deck_condition
 FROM bridges
 WHERE deck_condition <= 4;
+-- Expected output (first 5 rows, illustrative):
+-- structure_number | county      | facility_carried | deck_condition
+-- -----------------+-------------+------------------+---------------
+-- ID-1000          | LOS ANGELES | Sample A         | 10            
+-- ID-1001          | SAN DIEGO   | Sample B         | 25            
+-- ID-1002          | SACRAMENTO  | Sample C         | 42            
+-- ...
+
 
 -- Q6
 SELECT
@@ -78,6 +118,14 @@ ORDER BY CASE
     ELSE 4
 END
 LIMIT 30;
+-- Expected output (first 5 rows, illustrative):
+-- structure_number | county      | deck_condition | maintenance_priority
+-- -----------------+-------------+----------------+---------------------
+-- ID-1000          | LOS ANGELES | 10             | Sample A            
+-- ID-1001          | SAN DIEGO   | 25             | Sample B            
+-- ID-1002          | SACRAMENTO  | 42             | Sample C            
+-- ...
+
 
 -- Q7
 SELECT
@@ -102,3 +150,11 @@ SELECT
     END AS traffic_bucket
 FROM bridges
 LIMIT 20;
+-- Expected output (first 5 rows, illustrative):
+-- structure_number | county      | year_built | data_year | bridge_age | effective_year | condition_bucket | ...     
+-- -----------------+-------------+------------+-----------+------------+----------------+------------------+---------
+-- ID-1000          | LOS ANGELES | 1950       | 1950      | Sample A   | 1950           | 10               | Sample A
+-- ID-1001          | SAN DIEGO   | 1965       | 1965      | Sample B   | 1965           | 25               | Sample B
+-- ID-1002          | SACRAMENTO  | 1980       | 1980      | Sample C   | 1980           | 42               | Sample C
+-- ...
+
