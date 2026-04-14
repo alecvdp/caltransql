@@ -126,6 +126,26 @@ else
     echo "  Run ./scripts/download-data.sh first"
 fi
 
+# ------------------------------------------------------------
+# Load construction projects + contracts (synthetic data)
+# ------------------------------------------------------------
+PROJECTS_FILE="$DATA_DIR/construction_projects.csv"
+CONTRACTS_FILE="$DATA_DIR/contracts.csv"
+if [ -f "$PROJECTS_FILE" ] && [ -f "$CONTRACTS_FILE" ]; then
+    echo "Loading construction projects + contracts..."
+    cd "$REPO_DIR"
+    if run_sql -v ON_ERROR_STOP=1 -f "$REPO_DIR/scripts/load-contracts.sql"; then
+        PROJECT_COUNT=$(run_sql -t -c "SELECT COUNT(*) FROM construction_projects;" | tr -d ' ')
+        CONTRACT_COUNT=$(run_sql -t -c "SELECT COUNT(*) FROM contracts;" | tr -d ' ')
+        echo "  Loaded construction_projects=$PROJECT_COUNT contracts=$CONTRACT_COUNT"
+    else
+        echo "  Contract data load failed. Check scripts/load-contracts.sql for details."
+    fi
+else
+    echo "Skipping construction projects + contracts (files not found)."
+    echo "  Generate them with: python3 scripts/generate-contract-data.py"
+fi
+
 echo ""
 echo "=== Data loading complete ==="
 echo ""
