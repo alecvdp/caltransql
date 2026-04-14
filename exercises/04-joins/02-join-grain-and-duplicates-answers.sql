@@ -2,11 +2,35 @@
 
 -- Q1
 SELECT COUNT(*) AS bridge_rows FROM bridges;
+-- Expected output (first 5 rows, illustrative):
+-- bridge_rows
+-- -----------
+-- Sample A   
+-- Sample B   
+-- Sample C   
+-- ...
+
 SELECT COUNT(*) AS project_rows FROM construction_projects;
+-- Expected output (first 5 rows, illustrative):
+-- project_rows
+-- ------------
+-- ID-1000     
+-- ID-1001     
+-- ID-1002     
+-- ...
+
 SELECT COUNT(*) AS joined_rows
 FROM bridges b
 JOIN construction_projects p
     ON b.county = p.county;
+-- Expected output (first 5 rows, illustrative):
+-- joined_rows
+-- -----------
+-- Sample A   
+-- Sample B   
+-- Sample C   
+-- ...
+
 
 -- Q2
 SELECT
@@ -17,6 +41,14 @@ JOIN construction_projects p
     ON b.county = p.county
 GROUP BY b.county
 ORDER BY joined_row_count DESC;
+-- Expected output (first 5 rows, illustrative):
+-- county      | joined_row_count
+-- ------------+-----------------
+-- LOS ANGELES | 10              
+-- SAN DIEGO   | 25              
+-- SACRAMENTO  | 42              
+-- ...
+
 
 -- Q3
 WITH bridge_counts AS (
@@ -38,6 +70,14 @@ FROM bridge_counts bc
 LEFT JOIN project_summary ps
     ON bc.county = ps.county
 ORDER BY bc.bridge_count DESC;
+-- Expected output (first 5 rows, illustrative):
+-- county      | bridge_count | project_count | total_project_cost
+-- ------------+--------------+---------------+-------------------
+-- LOS ANGELES | 10           | 10            | 10                
+-- SAN DIEGO   | 25           | 25            | 25                
+-- SACRAMENTO  | 42           | 42            | 42                
+-- ...
+
 
 -- Q4
 WITH bridge_counts AS (
@@ -56,6 +96,14 @@ LEFT JOIN project_counts pc
     ON bc.county = pc.county
 WHERE pc.county IS NULL
 ORDER BY bc.bridge_count DESC;
+-- Expected output (first 5 rows, illustrative):
+-- county      | bridge_count
+-- ------------+-------------
+-- LOS ANGELES | 10          
+-- SAN DIEGO   | 25          
+-- SACRAMENTO  | 42          
+-- ...
+
 
 -- Q5
 SELECT
@@ -67,6 +115,14 @@ LEFT JOIN contracts c
 WHERE c.project_id IS NULL
 GROUP BY p.county
 ORDER BY project_count_without_contracts DESC;
+-- Expected output (first 5 rows, illustrative):
+-- county      | project_count_without_contracts
+-- ------------+--------------------------------
+-- LOS ANGELES | 10                             
+-- SAN DIEGO   | 25                             
+-- SACRAMENTO  | 42                             
+-- ...
+
 
 -- Q6
 SELECT
@@ -79,6 +135,14 @@ FROM construction_projects p
 JOIN contracts c
     ON p.project_id = c.project_id
 ORDER BY c.bid_amount DESC NULLS LAST;
+-- Expected output (first 5 rows, illustrative):
+-- project_id | county      | work_type               | contractor_name | bid_amount
+-- -----------+-------------+-------------------------+-----------------+-----------
+-- ID-1000    | LOS ANGELES | Pavement Rehabilitation | Sample A        | 10        
+-- ID-1001    | SAN DIEGO   | Bridge Repair           | Sample B        | 25        
+-- ID-1002    | SACRAMENTO  | Safety Improvement      | Sample C        | 42        
+-- ...
+
 
 -- Q7
 WITH project_counts AS (
@@ -105,6 +169,14 @@ FROM project_counts pc
 LEFT JOIN contract_counts cc
     ON pc.county = cc.county
 ORDER BY avg_contracts_per_project DESC NULLS LAST;
+-- Expected output (first 5 rows, illustrative):
+-- county      | project_count | contract_count | avg_contracts_per_project
+-- ------------+---------------+----------------+--------------------------
+-- LOS ANGELES | 10            | 10             | 10                       
+-- SAN DIEGO   | 25            | 25             | 25                       
+-- SACRAMENTO  | 42            | 42             | 42                       
+-- ...
+
 
 -- Q8
 WITH bridge_counts AS (
@@ -141,3 +213,11 @@ LEFT JOIN project_counts pc
 LEFT JOIN contract_summary cs
     ON bc.county = cs.county
 ORDER BY total_bid_amount DESC;
+-- Expected output (first 5 rows, illustrative):
+-- county      | bridge_count | project_count | contract_count | total_bid_amount | average_bid_amount
+-- ------------+--------------+---------------+----------------+------------------+-------------------
+-- LOS ANGELES | 10           | 10            | 10             | 10               | 10                
+-- SAN DIEGO   | 25           | 25            | 25             | 25               | 25                
+-- SACRAMENTO  | 42           | 42            | 42             | 42               | 42                
+-- ...
+

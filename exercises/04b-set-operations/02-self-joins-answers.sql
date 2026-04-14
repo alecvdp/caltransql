@@ -14,6 +14,14 @@ JOIN bridges b
 WHERE a.deck_condition <= 4
   AND b.deck_condition <= 4
 ORDER BY a.county, a.structure_number;
+-- Expected output (first 5 rows, illustrative):
+-- bridge_a | bridge_b | county      | deck_condition_a | deck_condition_b
+-- ---------+----------+-------------+------------------+-----------------
+-- Sample A | Sample A | LOS ANGELES | 10               | 10              
+-- Sample B | Sample B | SAN DIEGO   | 25               | 25              
+-- Sample C | Sample C | SACRAMENTO  | 42               | 42              
+-- ...
+
 
 -- Q2
 SELECT
@@ -31,6 +39,14 @@ JOIN bridges b
     AND b.year_built - a.year_built >= 30
 WHERE a.facility_carried IS NOT NULL
 ORDER BY year_diff DESC;
+-- Expected output (first 5 rows, illustrative):
+-- older_bridge | newer_bridge | facility_carried | county      | year_built_a | year_built_b | year_diff
+-- -------------+--------------+------------------+-------------+--------------+--------------+----------
+-- Sample A     | Sample A     | Sample A         | LOS ANGELES | 1950         | 1950         | 1950     
+-- Sample B     | Sample B     | Sample B         | SAN DIEGO   | 1965         | 1965         | 1965     
+-- Sample C     | Sample C     | Sample C         | SACRAMENTO  | 1980         | 1980         | 1980     
+-- ...
+
 
 -- Q3
 SELECT
@@ -51,6 +67,14 @@ WHERE a.features_intersected IS NOT NULL
   AND b.deck_condition IS NOT NULL
   AND ABS(a.deck_condition - b.deck_condition) >= 3
 ORDER BY condition_gap DESC;
+-- Expected output (first 5 rows, illustrative):
+-- bridge_a | bridge_b | county      | features_intersected | deck_condition_a | deck_condition_b | condition_gap
+-- ---------+----------+-------------+----------------------+------------------+------------------+--------------
+-- Sample A | Sample A | LOS ANGELES | Sample A             | 10               | 10               | 10           
+-- Sample B | Sample B | SAN DIEGO   | Sample B             | 25               | 25               | 25           
+-- Sample C | Sample C | SACRAMENTO  | Sample C             | 42               | 42               | 42           
+-- ...
+
 
 -- Q4
 SELECT
@@ -69,6 +93,14 @@ JOIN bridges b
 WHERE a.facility_carried IS NOT NULL
   AND a.deck_condition <= 5
 ORDER BY a.year_built ASC;
+-- Expected output (first 5 rows, illustrative):
+-- older_bridge | newer_bridge | facility_carried | county      | year_built_older | year_built_newer | older_deck_condition
+-- -------------+--------------+------------------+-------------+------------------+------------------+---------------------
+-- Sample A     | Sample A     | Sample A         | LOS ANGELES | 1950             | 1950             | 10                  
+-- Sample B     | Sample B     | Sample B         | SAN DIEGO   | 1965             | 1965             | 25                  
+-- Sample C     | Sample C     | Sample C         | SACRAMENTO  | 1980             | 1980             | 42                  
+-- ...
+
 
 -- Q5
 WITH all_pairs AS (
@@ -96,6 +128,14 @@ SELECT county, bridge_a, bridge_b, deck_a, deck_b, condition_gap
 FROM ranked
 WHERE rn = 1
 ORDER BY condition_gap DESC;
+-- Expected output (first 5 rows, illustrative):
+-- county      | bridge_a | bridge_b | deck_a   | deck_b   | condition_gap
+-- ------------+----------+----------+----------+----------+--------------
+-- LOS ANGELES | Sample A | Sample A | Sample A | Sample A | 10           
+-- SAN DIEGO   | Sample B | Sample B | Sample B | Sample B | 25           
+-- SACRAMENTO  | Sample C | Sample C | Sample C | Sample C | 42           
+-- ...
+
 
 -- Q6
 -- A plain GROUP BY is sufficient — no self-join required.
@@ -112,3 +152,11 @@ WHERE facility_carried IS NOT NULL
 GROUP BY facility_carried, county
 HAVING COUNT(*) > 1
 ORDER BY condition_gap DESC NULLS LAST;
+-- Expected output (first 5 rows, illustrative):
+-- facility_carried | county      | bridge_count | min_deck_condition | max_deck_condition | condition_gap
+-- -----------------+-------------+--------------+--------------------+--------------------+--------------
+-- Sample A         | LOS ANGELES | 10           | 10                 | 10                 | 10           
+-- Sample B         | SAN DIEGO   | 25           | 25                 | 25                 | 25           
+-- Sample C         | SACRAMENTO  | 42           | 42                 | 42                 | 42           
+-- ...
+

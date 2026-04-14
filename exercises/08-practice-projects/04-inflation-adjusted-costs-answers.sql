@@ -42,6 +42,14 @@ adjusted_contracts AS (
 SELECT *
 FROM adjusted_contracts
 ORDER BY award_date;
+-- Expected output (first 5 rows, illustrative):
+-- *             
+-- --------------
+-- <many columns>
+-- <many columns>
+-- <many columns>
+-- ...
+
 
 -- Deliverable 1: year-level nominal vs adjusted totals
 WITH contract_quarters AS (
@@ -85,6 +93,14 @@ SELECT
 FROM adjusted_contracts
 GROUP BY award_year
 ORDER BY award_year;
+-- Expected output (first 5 rows, illustrative):
+-- award_year | contract_count | nominal_total_bid_amount | inflation_adjusted_total_bid_amount | nominal_avg_bid_amount | inflation_adjusted_avg_bid_amount
+-- -----------+----------------+--------------------------+-------------------------------------+------------------------+----------------------------------
+-- 1950       | 10             | 10                       | 10                                  | 10                     | 10                               
+-- 1965       | 25             | 25                       | 25                                  | 25                     | 25                               
+-- 1980       | 42             | 42                       | 42                                  | 42                     | 42                               
+-- ...
+
 
 -- Deliverable 2: top contracts in adjusted dollars with project context
 WITH contract_quarters AS (
@@ -133,6 +149,14 @@ LEFT JOIN construction_projects p
     ON ac.project_id = p.project_id
 ORDER BY inflation_adjusted_bid_amount DESC NULLS LAST
 LIMIT 20;
+-- Expected output (first 5 rows, illustrative):
+-- contract_id | contractor_name | county      | work_type               | award_date | nominal_bid_amount | inflation_adjusted_bid_amount
+-- ------------+-----------------+-------------+-------------------------+------------+--------------------+------------------------------
+-- ID-1000     | Sample A        | LOS ANGELES | Pavement Rehabilitation | 2024-01-15 | 10                 | 10                           
+-- ID-1001     | Sample B        | SAN DIEGO   | Bridge Repair           | 2024-02-15 | 25                 | 25                           
+-- ID-1002     | Sample C        | SACRAMENTO  | Safety Improvement      | 2024-03-15 | 42                 | 42                           
+-- ...
+
 
 -- Deliverable 3: counties with highest adjusted spending
 WITH contract_quarters AS (
@@ -173,3 +197,11 @@ JOIN construction_projects p
     ON ac.project_id = p.project_id
 GROUP BY p.county
 ORDER BY inflation_adjusted_total_bid_amount DESC NULLS LAST;
+-- Expected output (first 5 rows, illustrative):
+-- county      | contract_count | nominal_total_bid_amount | inflation_adjusted_total_bid_amount
+-- ------------+----------------+--------------------------+------------------------------------
+-- LOS ANGELES | 10             | 10                       | 10                                 
+-- SAN DIEGO   | 25             | 25                       | 25                                 
+-- SACRAMENTO  | 42             | 42                       | 42                                 
+-- ...
+

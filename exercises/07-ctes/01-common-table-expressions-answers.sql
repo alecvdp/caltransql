@@ -10,6 +10,14 @@ SELECT county, COUNT(*) AS long_bridge_count
 FROM long_bridges
 GROUP BY county
 ORDER BY long_bridge_count DESC;
+-- Expected output (first 5 rows, illustrative):
+-- county      | long_bridge_count
+-- ------------+------------------
+-- LOS ANGELES | 10               
+-- SAN DIEGO   | 25               
+-- SACRAMENTO  | 42               
+-- ...
+
 
 -- Q2
 WITH county_deck_avg AS (
@@ -21,6 +29,14 @@ SELECT *
 FROM county_deck_avg
 WHERE avg_deck_condition < 6
 ORDER BY avg_deck_condition;
+-- Expected output (first 5 rows, illustrative):
+-- *             
+-- --------------
+-- <many columns>
+-- <many columns>
+-- <many columns>
+-- ...
+
 
 -- Q3
 WITH bridge_counts AS (
@@ -41,6 +57,14 @@ FROM bridge_counts bc
 LEFT JOIN project_counts pc
     ON bc.county = pc.county
 ORDER BY bc.bridge_count DESC;
+-- Expected output (first 5 rows, illustrative):
+-- county      | bridge_count | project_count
+-- ------------+--------------+--------------
+-- LOS ANGELES | 10           | 10           
+-- SAN DIEGO   | 25           | 25           
+-- SACRAMENTO  | 42           | 42           
+-- ...
+
 
 -- Q4
 WITH ranked_bridges AS (
@@ -59,6 +83,14 @@ SELECT *
 FROM ranked_bridges
 WHERE length_rank = 1
 ORDER BY county;
+-- Expected output (first 5 rows, illustrative):
+-- *             
+-- --------------
+-- <many columns>
+-- <many columns>
+-- <many columns>
+-- ...
+
 
 -- Q5
 WITH statewide_avg AS (
@@ -76,3 +108,11 @@ JOIN county_avgs c
     ON b.county = c.county
 CROSS JOIN statewide_avg s
 WHERE c.county_deck_avg < s.statewide_deck_avg;
+-- Expected output (first 5 rows, illustrative):
+-- *             
+-- --------------
+-- <many columns>
+-- <many columns>
+-- <many columns>
+-- ...
+

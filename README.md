@@ -157,6 +157,8 @@ Work through the exercises in order. Each file has examples to study, then quest
   `*-hints.sql` and `*-answers.sql`
 - Use the main `.sql` file first, then open the hint file only if you are stuck.
 - The answer key files show one valid approach. They are not the only correct solutions.
+- Answer key files include compact `-- Expected output (first 5 rows, illustrative)` comment blocks
+  after each query so you can quickly compare result shape and column order.
 - The practice project answer files are sample solutions for key deliverables rather than exhaustive solutions to every sub-step.
 
 ## Suggested Learning Path

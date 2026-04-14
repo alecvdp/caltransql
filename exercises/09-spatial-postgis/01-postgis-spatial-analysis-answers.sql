@@ -36,6 +36,14 @@ WHERE ST_DWithin(
     p.radius_km * 1000
 )
 ORDER BY distance_km;
+-- Expected output (first 5 rows, illustrative):
+-- structure_number | county      | facility_carried | distance_km
+-- -----------------+-------------+------------------+------------
+-- ID-1000          | LOS ANGELES | Sample A         | 10         
+-- ID-1001          | SAN DIEGO   | Sample B         | 25         
+-- ID-1002          | SACRAMENTO  | Sample C         | 42         
+-- ...
+
 
 -- Q2
 WITH bridge_points AS (
@@ -64,6 +72,14 @@ FROM clustered
 WHERE cluster_id IS NOT NULL
 GROUP BY cluster_id
 ORDER BY bridge_count DESC, cluster_id;
+-- Expected output (first 5 rows, illustrative):
+-- cluster_id | bridge_count | avg_deck_condition
+-- -----------+--------------+-------------------
+-- ID-1000    | 10           | 10                
+-- ID-1001    | 25           | 25                
+-- ID-1002    | 42           | 42                
+-- ...
+
 
 -- Q3
 WITH bridge_points AS (
@@ -94,6 +110,14 @@ CROSS JOIN LATERAL (
 ) n
 ORDER BY nearest_distance_km
 LIMIT 50;
+-- Expected output (first 5 rows, illustrative):
+-- structure_number | facility_carried | nearest_structure_number | nearest_distance_km
+-- -----------------+------------------+--------------------------+--------------------
+-- ID-1000          | Sample A         | ID-1000                  | 10                 
+-- ID-1001          | Sample B         | ID-1001                  | 25                 
+-- ID-1002          | Sample C         | ID-1002                  | 42                 
+-- ...
+
 
 -- Q4
 WITH bridge_points AS (
@@ -147,6 +171,14 @@ FROM nearby_crashes
 GROUP BY structure_number, county, facility_carried
 ORDER BY nearby_fatal_crash_count DESC, nearby_crash_count DESC
 LIMIT 25;
+-- Expected output (first 5 rows, illustrative):
+-- structure_number | county      | facility_carried | nearby_crash_count | nearby_fatal_crash_count | nearby_killed | nearby_injured
+-- -----------------+-------------+------------------+--------------------+--------------------------+---------------+---------------
+-- ID-1000          | LOS ANGELES | Sample A         | 10                 | 10                       | 10            | 10            
+-- ID-1001          | SAN DIEGO   | Sample B         | 25                 | 25                       | 25            | 25            
+-- ID-1002          | SACRAMENTO  | Sample C         | 42                 | 42                       | 42            | 42            
+-- ...
+
 
 -- Q5
 WITH project_points AS (
@@ -187,3 +219,11 @@ CROSS JOIN LATERAL (
 ) n
 ORDER BY nearest_station_distance_km
 LIMIT 100;
+-- Expected output (first 5 rows, illustrative):
+-- project_id | county      | route | nearest_station_id | nearest_station_route | nearest_station_distance_km
+-- -----------+-------------+-------+--------------------+-----------------------+----------------------------
+-- ID-1000    | LOS ANGELES | 5     | ID-1000            | 5                     | 10                         
+-- ID-1001    | SAN DIEGO   | 80    | ID-1001            | 80                    | 25                         
+-- ID-1002    | SACRAMENTO  | 101   | ID-1002            | 101                   | 42                         
+-- ...
+

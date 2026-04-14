@@ -38,6 +38,14 @@ SELECT
 FROM corridor_summary
 ORDER BY total_eal DESC NULLS LAST, avg_aadt_total DESC NULLS LAST
 LIMIT 15;
+-- Expected output (first 5 rows, illustrative):
+-- route | county      | station_count | avg_aadt_total | avg_truck_pct_total | total_eal
+-- ------+-------------+---------------+----------------+---------------------+----------
+-- 5     | LOS ANGELES | 10            | 10             | 10                  | 10       
+-- 80    | SAN DIEGO   | 25            | 25             | 25                  | 25       
+-- 101   | SACRAMENTO  | 42            | 42             | 42                  | 42       
+-- ...
+
 
 -- Deliverable 2: county safety-risk table
 WITH station_base AS (
@@ -83,6 +91,14 @@ FROM county_traffic ct
 LEFT JOIN county_crashes cc
     ON ct.county = cc.county
 ORDER BY fatal_crash_count DESC, avg_truck_pct_total DESC NULLS LAST;
+-- Expected output (first 5 rows, illustrative):
+-- county      | avg_aadt_total | avg_truck_pct_total | total_eal | crash_count | fatal_crash_count | total_killed | ...     
+-- ------------+----------------+---------------------+-----------+-------------+-------------------+--------------+---------
+-- LOS ANGELES | 10             | 10                  | 10        | 10          | 10                | 10           | Sample A
+-- SAN DIEGO   | 25             | 25                  | 25        | 25          | 25                | 25           | Sample B
+-- SACRAMENTO  | 42             | 42                  | 42        | 42          | 42                | 42           | Sample C
+-- ...
+
 
 -- Deliverable 3: fatal crash hotspots by county and road
 SELECT
@@ -96,3 +112,11 @@ FROM crashes
 GROUP BY county, primary_road
 ORDER BY fatal_crash_count DESC, total_killed DESC NULLS LAST
 LIMIT 20;
+-- Expected output (first 5 rows, illustrative):
+-- county      | primary_road | crash_count | fatal_crash_count | total_killed | total_injured
+-- ------------+--------------+-------------+-------------------+--------------+--------------
+-- LOS ANGELES | Sample A     | 10          | 10                | 10           | 10           
+-- SAN DIEGO   | Sample B     | 25          | 25                | 25           | 25           
+-- SACRAMENTO  | Sample C     | 42          | 42                | 42           | 42           
+-- ...
+
