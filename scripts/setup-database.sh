@@ -28,8 +28,29 @@ else
     exit 1
 fi
 
+# Maintenance database used for admin commands such as CREATE DATABASE.
+# Can be overridden in .env with PGMAINTENANCE_DB.
+if [ -n "${PGMAINTENANCE_DB:-}" ]; then
+    MAINTENANCE_DB="$PGMAINTENANCE_DB"
+else
+    MAINTENANCE_DB=""
+    for candidate_db in postgres personal template1; do
+        if psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d "$candidate_db" -c "SELECT 1;" &>/dev/null; then
+            MAINTENANCE_DB="$candidate_db"
+            break
+        fi
+    done
+fi
+
+if [ -z "$MAINTENANCE_DB" ]; then
+    echo "ERROR: Cannot connect to any maintenance database (tried: postgres, personal, template1)."
+    echo "Set PGMAINTENANCE_DB in .env if your server uses a different admin database."
+    exit 1
+fi
+
 echo "=== CaltransSQL Database Setup ==="
 echo "Server: $PGHOST:$PGPORT"
+echo "Maintenance DB: $MAINTENANCE_DB"
 echo ""
 
 # Check psql is available
@@ -38,8 +59,8 @@ if ! command -v psql &>/dev/null; then
     exit 1
 fi
 
-# Check connectivity (connect to the existing database to run admin commands)
-if ! psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d personal -c "SELECT 1;" &>/dev/null; then
+# Check connectivity (connect to the existing maintenance database to run admin commands)
+if ! psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d "$MAINTENANCE_DB" -c "SELECT 1;" &>/dev/null; then
     echo "ERROR: Cannot connect to PostgreSQL at $PGHOST:$PGPORT"
     echo "Check your .env settings and that the server is running."
     exit 1
@@ -47,10 +68,15 @@ fi
 
 # Create the caltransql database if it doesn't exist
 echo "Creating database '$PGDATABASE' (if it doesn't exist)..."
-psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d personal -tc \
-    "SELECT 1 FROM pg_database WHERE datname = '$PGDATABASE';" | grep -q 1 \
-    || psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d personal -c \
-    "CREATE DATABASE $PGDATABASE;"
+DB_EXISTS=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d "$MAINTENANCE_DB" \
+    -v ON_ERROR_STOP=1 -v target_db="$PGDATABASE" -tAc \
+    "SELECT 1 FROM pg_database WHERE datname = :'target_db';")
+
+if [ "$DB_EXISTS" != "1" ]; then
+    psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d "$MAINTENANCE_DB" \
+        -v ON_ERROR_STOP=1 -v target_db="$PGDATABASE" -c \
+        "SELECT format('CREATE DATABASE %I', :'target_db') \gexec"
+fi
 
 echo "Database '$PGDATABASE' ready."
 echo ""

@@ -1,6 +1,6 @@
 # CaltransSQL
 
-A hands-on SQL practice environment using real California transportation data. Uses a remote PostgreSQL server with JetBrains DataGrip as the query editor.
+A hands-on SQL practice environment using real California transportation data. The primary/recommended workflow uses an existing PostgreSQL server with JetBrains DataGrip as the query editor.
 
 ## Prerequisites
 
@@ -8,6 +8,7 @@ A hands-on SQL practice environment using real California transportation data. U
 - **JetBrains DataGrip** (or any SQL client)
 - **psql CLI** for running setup scripts (`brew install libpq` on macOS, then add to PATH)
 - **PostGIS extension available on your server** (required for the optional spatial module in `exercises/09-spatial-postgis/`)
+- **Docker + Docker Compose** (optional fallback if you do not have PostgreSQL)
 
 ## Quick Start
 
@@ -28,6 +29,45 @@ cp .env.example .env
 
 # 5. Validate the loaded data
 ./scripts/validate-data.sh
+```
+
+## Don't have PostgreSQL? Use Docker (optional)
+
+The direct PostgreSQL setup above is still the default path. If you do not already have a PostgreSQL server, you can run one locally with Docker Compose.
+
+```bash
+# 1. Copy env file
+cp .env.example .env
+
+# 2. In .env, set local Docker values:
+#    PGHOST=localhost
+#    PGPORT=5433
+#    PGUSER=caltrans
+#    PGPASSWORD=caltrans
+#    PGDATABASE=caltransql
+#    PGMAINTENANCE_DB=postgres
+
+# 3. Start PostgreSQL only
+docker compose -f docker/docker-compose.yml up -d postgres
+
+# Optional: also start pgAdmin + NocoDB
+docker compose -f docker/docker-compose.yml --profile tools up -d
+
+# 4. Run normal setup/load scripts
+./scripts/setup-database.sh
+./scripts/download-data.sh
+./scripts/load-data.sh
+./scripts/validate-data.sh
+```
+
+Optional services when `--profile tools` is enabled:
+- **pgAdmin:** http://localhost:5050 (defaults in compose file)
+- **NocoDB:** http://localhost:8080
+
+Stop services with:
+
+```bash
+docker compose -f docker/docker-compose.yml down
 ```
 
 ## Connecting DataGrip
@@ -183,6 +223,8 @@ Work through the exercises in order. Each file has examples to study, then quest
 ```
 caltransql/
 ├── .env.example                # Connection settings template
+├── docker/
+│   └── docker-compose.yml      # Optional local PostgreSQL + tools
 ├── schemas/                    # Table definitions
 │   ├── 00-postgis.sql
 │   ├── 01-bridges.sql
