@@ -14,7 +14,8 @@
 
 set -euo pipefail
 
-DATA_DIR="$(cd "$(dirname "$0")/../data" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+DATA_DIR="$(cd "$SCRIPT_DIR/../data" && pwd)"
 echo "Downloading data to: $DATA_DIR"
 echo ""
 
@@ -177,8 +178,13 @@ echo ""
 echo "=== 9. Caltrans Contract Cost Data ==="
 echo "   Source: https://sv08data.dot.ca.gov/contractcost/"
 echo "  NOTE: This database is web-only (no bulk CSV download)."
-echo "        You can search by item code, district, and year."
-echo "        For exercises, we include sample data in schemas/."
+echo "        Generating synthetic contract data instead..."
+if command -v python3 &>/dev/null; then
+    python3 "$SCRIPT_DIR/generate-contract-data.py"
+else
+    echo "  WARNING: python3 not found. Install Python 3 and run:"
+    echo "           python3 scripts/generate-contract-data.py"
+fi
 echo ""
 
 # ------------------------------------------------------------
