@@ -7,6 +7,7 @@ A hands-on SQL practice environment using real California transportation data. U
 - **PostgreSQL server** accessible on your network
 - **JetBrains DataGrip** (or any SQL client)
 - **psql CLI** for running setup scripts (`brew install libpq` on macOS, then add to PATH)
+- **PostGIS extension available on your server** (required for the optional spatial module in `exercises/09-spatial-postgis/`)
 
 ## Quick Start
 
@@ -16,6 +17,7 @@ cp .env.example .env
 # Edit .env with your server connection details
 
 # 2. Create the database and tables
+#    (also attempts to enable PostGIS if available)
 ./scripts/setup-database.sh
 
 # 3. Download public datasets
@@ -123,6 +125,7 @@ Work through the exercises in order. Each file has examples to study, then quest
 | 06  | Window Functions, running totals, percentiles | `exercises/06-window-functions/` | Intermediate/Advanced |
 | 07  | CTEs and multi-step analysis | `exercises/07-ctes/`    | Intermediate/Advanced |
 | 08  | Practice Projects   | `exercises/08-practice-projects/` | All levels  |
+| 09  | Spatial analysis with PostGIS | `exercises/09-spatial-postgis/` | Advanced |
 
 ### Recently Added Exercises
 
@@ -135,6 +138,7 @@ Work through the exercises in order. Each file has examples to study, then quest
 - `exercises/05-subqueries/02-exists-and-not-exists.sql`
 - `exercises/06-window-functions/02-running-stats-and-percentiles.sql`
 - `exercises/07-ctes/02-multi-step-analysis.sql`
+- `exercises/09-spatial-postgis/01-postgis-spatial-analysis.sql`
 
 ### Expanded Practice Projects
 
@@ -177,6 +181,7 @@ Work through the exercises in order. Each file has examples to study, then quest
 caltransql/
 ├── .env.example                # Connection settings template
 ├── schemas/                    # Table definitions
+│   ├── 00-postgis.sql
 │   ├── 01-bridges.sql
 │   ├── 02-construction-projects.sql
 │   ├── 03-contracts.sql
@@ -193,7 +198,8 @@ caltransql/
 │   ├── 05-subqueries/
 │   ├── 06-window-functions/
 │   ├── 07-ctes/
-│   └── 08-practice-projects/
+│   ├── 08-practice-projects/
+│   └── 09-spatial-postgis/
 ├── data/                       # Downloaded CSV files (git-ignored)
 └── scripts/
     ├── setup-database.sh       # Create database and tables
