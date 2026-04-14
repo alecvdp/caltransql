@@ -123,7 +123,7 @@ Work through the exercises in order. Each file has examples to study, then quest
 | 04b | UNION, INTERSECT, EXCEPT, and self-joins | `exercises/04b-set-operations/` | Intermediate |
 | 05  | Subqueries, EXISTS, NOT EXISTS | `exercises/05-subqueries/` | Intermediate |
 | 06  | Window Functions, running totals, percentiles | `exercises/06-window-functions/` | Intermediate/Advanced |
-| 07  | CTEs and multi-step analysis | `exercises/07-ctes/`    | Intermediate/Advanced |
+| 07  | CTEs, recursive CTEs, and multi-step analysis | `exercises/07-ctes/`    | Intermediate/Advanced |
 | 08  | Practice Projects   | `exercises/08-practice-projects/` | All levels  |
 | 09  | Spatial analysis with PostGIS | `exercises/09-spatial-postgis/` | Advanced |
 
@@ -138,6 +138,7 @@ Work through the exercises in order. Each file has examples to study, then quest
 - `exercises/05-subqueries/02-exists-and-not-exists.sql`
 - `exercises/06-window-functions/02-running-stats-and-percentiles.sql`
 - `exercises/07-ctes/02-multi-step-analysis.sql`
+- `exercises/07-ctes/03-recursive.sql`
 - `exercises/09-spatial-postgis/01-postgis-spatial-analysis.sql`
 
 ### Expanded Practice Projects
